@@ -1,0 +1,28 @@
+#* Docker Compose version
+version: '3.9'
+
+#* All services to be used will be declared
+services:
+
+  #* Service name
+  server:
+    #* Image to use
+    image: node:20.12.1
+    init: true
+    #* Directory where you will work
+    working_dir: /home/dev
+    #* Container name
+    container_name: tortimazer-server
+    command: sh -c "npm i && npm run dev"
+    #* Port exhibition
+    ports:
+      - 3000:3000
+      - 3001:3001
+    #* Volume where information persists
+    volumes:
+      - .:/home/dev
+    restart: unless-stopped
+    environment:
+      #* The environment to run the server on
+      #* development | sandbox | production
+      NODE_ENV: development

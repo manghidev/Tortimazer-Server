@@ -1,0 +1,33 @@
+{
+  "name": "tortimazer-server",
+  "version": "0.0.0",
+  "description": "Tortimazer Server",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node dist/src/index.js",
+    "dev": "npx concurrently \"npx tsc --watch\" \"npx nodemon dist/src/index.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manghidev/Tortimazer-Server.git"
+  },
+  "author": "manghidev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manghidev/Tortimazer-Server/issues"
+  },
+  "homepage": "https://github.com/manghidev/Tortimazer-Server#readme",
+  "devDependencies": {
+    "@types/express": "4.17.21",
+    "@types/node": "20.12.4",
+    "concurrently": "8.2.2",
+    "nodemon": "3.1.0",
+    "typescript": "5.4.4"
+  },
+  "dependencies": {
+    "aws-crt": "1.21.1",
+    "aws-iot-device-sdk-v2": "1.19.1",
+    "express": "4.19.2",
+    "socket.io": "4.7.5"
+  }
+}
