@@ -1,21 +1,19 @@
 import express from 'express';
-const app = express();
+import path from 'path';
+import { mqtt as awsMqtt } from 'aws-iot-device-sdk-v2';
+import { TextDecoder } from 'util';
+import { iot as awsIot, mqtt } from 'aws-crt';
 import { createServer } from 'http';
-const socketServer = createServer(app);
 import { Server } from 'socket.io';
+import env from '../../config/env.config';
+
+const app = express();
+const socketServer = createServer(app);
 const io = new Server(socketServer, {
     cors: {
         origin: '*',
     },
 });
-
-import path from 'path';
-import iot_sdk from 'aws-iot-device-sdk-v2';
-const mqtt = iot_sdk.mqtt
-import { TextDecoder } from 'util';
-import aws_crt from 'aws-crt';
-const iot = aws_crt.iot;
-const mqtt_crt = aws_crt.mqtt;
 
 const iotCoreServer = async () => {
     const decoder = new TextDecoder('utf-8');
@@ -24,50 +22,62 @@ const iotCoreServer = async () => {
         'client_to_server',
         'board_to_server',
         'server_to_clients',
-        'server_to_boards'
+        'server_to_boards',
+        'board_to_server_ok'
     ];
 
-    const certificate = path.join(__dirname, '/../keys', 'cert.pem');
-    const privateKey = path.join(__dirname, '/../keys', 'private.key');
-    const rootCA = path.join(__dirname, '/../keys', 'root-CA.crt');
-    const clientID = '{clientID}';
-    const endPoint = '{code}-ats.iot.{region}.amazonaws.com';
+    const certificate = path.join(__dirname, '../../keys', 'cert.pem');
+    const privateKey = path.join(__dirname, '/../../keys', 'private.key');
+    const rootCA = path.join(__dirname, '/../../keys', 'root-CA.crt');
+    const thingName = env.AWS_IOT_CORE_THING_NAME ?? '';
+    const endPoint = env.AWS_IOT_CORE_ENDPOINT ?? '';
 
-    const config_builder = iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(certificate, privateKey);
+    const config_builder = awsIot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(certificate, privateKey);
 
     config_builder.with_certificate_authority_from_path(undefined, rootCA);
 
     config_builder.with_clean_session(false);
-    config_builder.with_client_id(clientID);
+    config_builder.with_client_id(thingName);
     config_builder.with_endpoint(endPoint);
 
-    const connection = new mqtt_crt.MqttClient().new_connection(config_builder.build());
+    const connection = new mqtt.MqttClient().new_connection(config_builder.build());
 
-    await connection.connect().catch((error) => console.log("Connect error: " + error));
+    await connection.connect().then(() => {
+        console.log("Connected to AWS IoT Core");
+    }).catch((error) => console.log("Connect error: " + error));
 
-    // * Método para escuchar las conexiones de los clientes
+    // * Method to listen to client connections
     io.on('connection', (socket) => {
         console.log(`User connected with id: ${socket.id}`);
 
-        // * Método para escuchar los mensajes de los clientes
+        // * Method for listening to customer messages
         socket.on(topics[0], async (message) => {
             console.log("Received from client", message);
 
-            // * Se notifica a las tablillas
-            await connection.publish(topics[3], message, mqtt.QoS.AtLeastOnce);
+            // * The boards are notified
+            await connection.publish(topics[3], message, awsMqtt.QoS.AtLeastOnce);
             console.log("Message sent to boards");
         });
     });
 
-    // * Método para escuchar los mensajes de las tablillas
-    await connection.subscribe(topics[1], mqtt.QoS.AtLeastOnce, async (topic, payload) => {
+    // * Method to listen to the messages on the tablets
+    await connection.subscribe(topics[1], awsMqtt.QoS.AtLeastOnce, async (topic, payload) => {
         const data = JSON.parse(decoder.decode(payload));
-        console.log("Received from board", topic, data);
+        console.log("Received from", topic, data);
 
-        // * Se notifica a los clientes
+        // * Customers are notified
         io.emit(topics[2], data);
         console.log("Message sent to clients");
     });
+
+    await connection.subscribe(topics[4], awsMqtt.QoS.AtLeastOnce, async (topic, payload) => {
+        const data = JSON.parse(decoder.decode(payload));
+        console.log("Received from", topic, data);
+
+        // * Customers are notified
+        io.emit(topics[2], data);
+        console.log("Message sent to client ok");
+    });
 };
 
-export { iotCoreServer };
+export { iotCoreServer, socketServer };

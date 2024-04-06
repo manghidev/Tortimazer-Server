@@ -7,6 +7,9 @@ import json from '../../package.json';
 interface ENV {
     NODE_ENV: string | undefined;
     SERVER_VERSION: string;
+    AWS_IOT_CORE_ENDPOINT: string | undefined;
+    AWS_IOT_CORE_THING_NAME: string | undefined;
+    PORT_SOCKET_IO: Number | undefined;
 };
 
 //* Loading process.env as ENV interface
@@ -14,6 +17,9 @@ const _getConfig = (): ENV => {
     return {
         NODE_ENV: process.env.NODE_ENV,
         SERVER_VERSION: json.version,
+        AWS_IOT_CORE_ENDPOINT: process.env.AWS_IOT_CORE_ENDPOINT,
+        AWS_IOT_CORE_THING_NAME: process.env.AWS_IOT_CORE_THING_NAME,
+        PORT_SOCKET_IO : Number(process.env.PORT_SOCKET_IO)
     };
 };
 

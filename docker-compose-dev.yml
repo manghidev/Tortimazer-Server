@@ -16,13 +16,10 @@ services:
     command: sh -c "npm i && npm run dev"
     #* Port exhibition
     ports:
-      - 3000:3000
       - 3001:3001
     #* Volume where information persists
     volumes:
       - .:/home/dev
     restart: unless-stopped
-    environment:
-      #* The environment to run the server on
-      #* development | sandbox | production
-      NODE_ENV: development
+    env_file:
+      - .env

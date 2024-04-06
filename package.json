@@ -1,11 +1,12 @@
 {
   "name": "tortimazer-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Tortimazer Server",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node dist/src/index.js",
-    "dev": "npx concurrently \"npx tsc --watch\" \"npx nodemon dist/src/index.js\""
+    "copy": "npx copyfiles --error --up 1 src/keys/* dist/src/",
+    "start": "npx tsc && npm run copy && node dist/src/index.js",
+    "dev": "npx concurrently \"npx tsc --watch\" \"npm run copy\" \"npx nodemon dist/src/index.js\""
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,9 @@
     "@types/express": "4.17.21",
     "@types/node": "20.12.4",
     "concurrently": "8.2.2",
+    "copyfiles": "2.4.1",
     "nodemon": "3.1.0",
+    "ts-node-dev": "2.0.0",
     "typescript": "5.4.4"
   },
   "dependencies": {
