@@ -5,7 +5,21 @@ import { TextDecoder } from 'util';
 import { iot as awsIot, mqtt } from 'aws-crt';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import crypto from "crypto";
 import env from '../../config/env.config';
+
+import { DynamoDBClient, ExecuteStatementCommand } from "@aws-sdk/client-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+
+const client = new DynamoDBClient([
+    {
+        region: env.AWS_REGION,
+        credentials: {
+            accessKeyId: env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: env.AWS_SECRET_ACCESS_KEY
+        }
+    }
+]);
 
 const app = express();
 const socketServer = createServer(app);
@@ -64,6 +78,27 @@ const iotCoreServer = async () => {
     await connection.subscribe(topics[1], awsMqtt.QoS.AtLeastOnce, async (topic, payload) => {
         const data = JSON.parse(decoder.decode(payload));
         console.log("Received from", topic, data);
+
+        const dataCompany = (await client.send(new ExecuteStatementCommand({
+            Statement: `SELECT * FROM "config-tortimazer" WHERE uid = '${env.UID_COMPANY}'`,
+            ConsistentRead: true
+        }))).Items?.map((record) => unmarshall(record));
+
+        const date = new Date();
+
+        // * Save data in DynamoDB
+        await client.send(new ExecuteStatementCommand({
+            Statement: `
+                INSERT INTO "record-tortimazer"
+                value {
+                    'uid': '${crypto.randomUUID({ disableEntropyCache: true })}',
+                    'price': '${dataCompany![0].pricePerKilo}',
+                    'uidCompany': '${env.UID_COMPANY}',
+                    'tortillas': '${data.tortillas}',
+                    'creationDate': '${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${(date.getDate() < 10) ? '0' + date.getDate() : date.getDate()}'
+                };
+            `
+        })).then(() => console.log("Data saved in DynamoDB"));
 
         // * Customers are notified
         io.emit(topics[2], data);

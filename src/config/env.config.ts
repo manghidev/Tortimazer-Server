@@ -10,6 +10,10 @@ interface ENV {
     AWS_IOT_CORE_ENDPOINT: string | undefined;
     AWS_IOT_CORE_THING_NAME: string | undefined;
     PORT_SOCKET_IO: Number | undefined;
+    AWS_REGION: string | undefined;
+    AWS_ACCESS_KEY_ID: string | undefined;
+    AWS_SECRET_ACCESS_KEY: string | undefined;
+    UID_COMPANY: string | undefined;
 };
 
 //* Loading process.env as ENV interface
@@ -19,7 +23,11 @@ const _getConfig = (): ENV => {
         SERVER_VERSION: json.version,
         AWS_IOT_CORE_ENDPOINT: process.env.AWS_IOT_CORE_ENDPOINT,
         AWS_IOT_CORE_THING_NAME: process.env.AWS_IOT_CORE_THING_NAME,
-        PORT_SOCKET_IO : Number(process.env.PORT_SOCKET_IO)
+        PORT_SOCKET_IO : Number(process.env.PORT_SOCKET_IO),
+        AWS_REGION: process.env.AWS_REGION,
+        AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+        UID_COMPANY: process.env.UID_COMPANY
     };
 };
 

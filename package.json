@@ -1,6 +1,6 @@
 {
   "name": "tortimazer-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tortimazer Server",
   "main": "src/index.ts",
   "scripts": {
@@ -28,6 +28,8 @@
     "typescript": "5.4.4"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.552.0",
+    "@aws-sdk/util-dynamodb": "3.552.0",
     "aws-crt": "1.21.1",
     "aws-iot-device-sdk-v2": "1.19.1",
     "express": "4.19.2",
