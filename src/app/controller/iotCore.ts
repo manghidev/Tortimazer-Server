@@ -112,7 +112,7 @@ const iotCoreServer = async () => {
         console.log("Received from", topic, data);
 
         // * Customers are notified
-        io.emit(topics[2], data);
+        io.emit(topics[4], data);
         console.log("Message sent to client ok");
     });
 };
