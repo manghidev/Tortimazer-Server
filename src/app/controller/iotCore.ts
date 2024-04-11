@@ -86,13 +86,15 @@ const iotCoreServer = async () => {
 
         const date = new Date();
 
+        const price = (dataCompany![0].pricePerKilo * data.tortillas) / 30;
+
         // * Save data in DynamoDB
         await client.send(new ExecuteStatementCommand({
             Statement: `
                 INSERT INTO "record-tortimazer"
                 value {
                     'uid': '${crypto.randomUUID({ disableEntropyCache: true })}',
-                    'price': '${dataCompany![0].pricePerKilo}',
+                    'price': '${price}',
                     'uidCompany': '${env.UID_COMPANY}',
                     'tortillas': '${data.tortillas}',
                     'creationDate': '${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${(date.getDate() < 10) ? '0' + date.getDate() : date.getDate()}'
