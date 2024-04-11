@@ -68,10 +68,8 @@ const iotCoreServer = async () => {
         socket.on(topics[0], async (message) => {
             console.log("Received from client", message);
 
-            let temp = JSON.parse(message);
-
-            temp = JSON.stringify({
-                p: `${temp.p}`,
+            const temp = JSON.stringify({
+                p: `${message.p}`,
             });
 
             // * The boards are notified
