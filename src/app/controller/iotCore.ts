@@ -68,14 +68,14 @@ const iotCoreServer = async () => {
         socket.on(topics[0], async (message) => {
             console.log("Received from client", message);
 
-            message = JSON.parse(message);
+            let temp = JSON.parse(message);
 
-            message = JSON.stringify({
-                p: `${message.p}`,
+            temp = JSON.stringify({
+                p: `${temp.p}`,
             });
 
             // * The boards are notified
-            await connection.publish(topics[3], message, awsMqtt.QoS.AtLeastOnce);
+            await connection.publish(topics[3], temp, awsMqtt.QoS.AtLeastOnce);
             console.log("Message sent to boards");
         });
     });
