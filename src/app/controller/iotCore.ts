@@ -37,7 +37,8 @@ const iotCoreServer = async () => {
         'board_to_server',
         'server_to_clients',
         'server_to_boards',
-        'board_to_server_ok'
+        'board_to_server_ok',
+        'server_to_clients_ok'
     ];
 
     const certificate = path.join(__dirname, '../../keys', 'cert.pem');
@@ -120,7 +121,7 @@ const iotCoreServer = async () => {
         console.log("Received from", topic, data);
 
         // * Customers are notified
-        io.emit(topics[4], data);
+        io.emit(topics[5], data);
         console.log("Message sent to client ok");
     });
 };
