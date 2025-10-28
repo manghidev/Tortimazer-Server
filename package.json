@@ -32,7 +32,7 @@
     "@aws-sdk/util-dynamodb": "3.552.0",
     "aws-crt": "1.21.1",
     "aws-iot-device-sdk-v2": "1.19.1",
-    "express": "4.20.0",
+    "express": "4.21.2",
     "socket.io": "4.7.5"
   }
 }
